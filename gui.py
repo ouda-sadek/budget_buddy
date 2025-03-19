@@ -22,7 +22,7 @@ class BudgetBuddyApp(ctk.CTk):
         self.create_widgets()
 
     def set_background_image(self, image_path):
-      """Charge et affiche une image comme arrière-plan redimensionnée."""
+      
       try:
         if os.path.exists(image_path):
            # Load the image with PIL
