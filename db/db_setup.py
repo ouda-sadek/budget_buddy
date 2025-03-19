@@ -7,7 +7,7 @@ def create_database():
     conn = mysql.connector.connect(
         host="localhost", 
         user="root", 
-        password=""
+        password="root"
     )  
     if conn.is_connected():
             print("Successful connection to MySQL server")
