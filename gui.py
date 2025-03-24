@@ -2,7 +2,8 @@ import customtkinter as ctk
 from tkinter import messagebox
 from PIL import Image, ImageEnhance
 import os
-from user import UserManager  
+from user import UserManager
+from account import AccountWindow  # Importer la classe mais sans l'exécuter
 
 ctk.set_appearance_mode("Dark")
 
@@ -23,7 +24,7 @@ class BudgetBuddyApp(ctk.CTk):
         self.overlay = ctk.CTkLabel(self, text="", fg_color="black", width=800, height=600)
         self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.overlay.lower()  # Toujours en arrière-plan
-
+        
         self.create_main_buttons()
 
     def set_background_image(self, image_path):
@@ -57,20 +58,20 @@ class BudgetBuddyApp(ctk.CTk):
         self.bg_label.configure(image=self.bg_photo)
 
     def clear_widgets(self):
-        """Supprime tous les widgets SAUF l'image de fond"""
+        "Removes all widgets EXCEPT the background image"
         for widget in self.winfo_children():
-            if widget not in [self.bg_label, self.overlay]:  # Garde l'image et le calque
+            if widget not in [self.bg_label, self.overlay]:  # Keep the image and the layer
                 widget.destroy()
 
     def create_main_buttons(self):
-        """Affiche les boutons principaux et enlève l'effet d'assombrissement"""
+        """Shows the main buttons and removes the darkening effect"""
         self.clear_widgets()
-        self.darken_background(False)  # Supprime l'effet sombre
+        self.darken_background(False)  # Removes the dark effect
 
-        self.login_button = ctk.CTkButton(self, text="Login", command=self.show_login_screen, width=200, height=50, fg_color="#669966")
+        self.login_button = ctk.CTkButton(self, text="Se connecter", command=self.show_login_screen, width=200, height=50, fg_color="#669966")
         self.login_button.place(x=170, y=450)
 
-        self.signup_button = ctk.CTkButton(self, text="Signup", command=self.show_signup_screen, width=200, height=50, fg_color="#669966")
+        self.signup_button = ctk.CTkButton(self, text="S'enregister", command=self.show_signup_screen, width=200, height=50, fg_color="#669966")
         self.signup_button.place(x=450, y=450)
 
     def show_login_screen(self):
@@ -91,18 +92,21 @@ class BudgetBuddyApp(ctk.CTk):
             password = password_entry.get()
             success, user_data = self.user_manager.login_user(email, password)
             if success:
-                messagebox.showinfo("Succès", f"Bienvenue {user_data['first_name']} !")
-                self.create_main_buttons()  # Retour au menu principal
+                self.withdraw()  # Cache la fenêtre principale
+                account_window = AccountWindow(self, user_data)
+                account_window.protocol("WM_DELETE_WINDOW", lambda: self.deiconify())  # Rouvrir la fenêtre principale si on ferme Account
+                
             else:
                 messagebox.showerror("Erreur", user_data)
 
-        ctk.CTkButton(self, text="Se connecter", command=login).pack(pady=10)
-        ctk.CTkButton(self, text="Retour", command=self.create_main_buttons).pack(pady=5)
+        ctk.CTkButton(self, text="Se connecter", command=login, fg_color="#669966").pack(pady=10)
+        ctk.CTkButton(self, text="Retour", command=self.create_main_buttons, fg_color="#669966").pack(pady=10)
+        
 
     def show_signup_screen(self):
-        """Affiche le formulaire d'inscription et assombrit le fond"""
+        """Shows the registration form and darkens the background"""
         self.clear_widgets()
-        self.darken_background(True)  # Active l'effet sombre
+        self.darken_background(True)  # Enables the dark effect
 
         ctk.CTkLabel(self, text="Prénom:").pack(pady=5)
         first_name_entry = ctk.CTkEntry(self)
@@ -129,14 +133,10 @@ class BudgetBuddyApp(ctk.CTk):
             success, message = self.user_manager.register_user(first_name, last_name, email, password)
             if success:
                 messagebox.showinfo("Succès", message)
-                self.create_main_buttons()  # Retour au menu principal
+                self.create_main_buttons()  # Return to main menu
             else:
                 messagebox.showerror("Erreur", message)
 
-        ctk.CTkButton(self, text="S'inscrire", command=signup).pack(pady=10)
-        ctk.CTkButton(self, text="Retour", command=self.create_main_buttons).pack(pady=5)
+        ctk.CTkButton(self, text="S'inscrire", command=signup, fg_color="#669966").pack(pady=10)
+        ctk.CTkButton(self, text="Retour", command=self.create_main_buttons, fg_color="#669966").pack(pady=5)
 
-# Lancer l’application
-if __name__ == "__main__":
-    app = BudgetBuddyApp()
-    app.mainloop()
