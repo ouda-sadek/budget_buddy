@@ -4,6 +4,8 @@ from PIL import Image, ImageEnhance
 import os
 from user import UserManager
 from account import AccountWindow  # Importer la classe mais sans l'exécuter
+from banker import BankerLoginWindow
+from banker_dashboard import BankerDashboard
 
 ctk.set_appearance_mode("Dark")
 
@@ -73,7 +75,8 @@ class BudgetBuddyApp(ctk.CTk):
 
         self.signup_button = ctk.CTkButton(self, text="S'enregister", command=self.show_signup_screen, width=200, height=50, fg_color="#669966")
         self.signup_button.place(x=450, y=450)
-
+        self.banker_button = ctk.CTkButton(self, text="Connexion Banquier", command=self.open_banker_login, width=200, height=50, fg_color="#669966")
+        self.banker_button.place(x=310, y=520)
     def show_login_screen(self):
         """Affiche le formulaire de connexion et assombrit le fond"""
         self.clear_widgets()
@@ -139,4 +142,39 @@ class BudgetBuddyApp(ctk.CTk):
 
         ctk.CTkButton(self, text="S'inscrire", command=signup, fg_color="#669966").pack(pady=10)
         ctk.CTkButton(self, text="Retour", command=self.create_main_buttons, fg_color="#669966").pack(pady=5)
+        
+    def open_banker_login(self):
+        self.clear_widgets()
+        self.darken_background(True)
 
+        ctk.CTkLabel(self, text="Connexion Banquier", font=("Arial", 20, "bold")).pack(pady=20)
+
+        ctk.CTkLabel(self, text="Email :").pack()
+        email_entry = ctk.CTkEntry(self)
+        email_entry.pack(pady=5)
+
+        ctk.CTkLabel(self, text="Mot de passe :").pack()
+        password_entry = ctk.CTkEntry(self, show="*")
+        password_entry.pack(pady=5)
+
+        def banker_login():
+            from db.database import Database
+            db = Database("localhost", "root", "root", "budget_buddy")
+            result = db.execute_query("SELECT id, name, password FROM bankers WHERE email = %s", (email_entry.get(),))
+
+            if not result:
+                messagebox.showerror("Erreur", "Banquier non trouvé.")
+                return
+
+            banker_id, name, stored_password = result[0]
+
+            if password_entry.get() == stored_password:  # (à sécuriser plus tard)
+                messagebox.showinfo("Bienvenue", f"Bonjour {name} !")
+                BankerDashboard(self, banker_id)
+                #self.create_main_buttons()
+            else:
+                messagebox.showerror("Erreur", "Mot de passe incorrect.")
+
+        ctk.CTkButton(self, text="Connexion", command=banker_login, fg_color="#669966").pack(pady=10)
+        ctk.CTkButton(self, text="Retour", command=self.create_main_buttons, fg_color="#669966").pack(pady=5)
+    

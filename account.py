@@ -59,7 +59,7 @@ class AccountWindow(ctk.CTkToplevel):
         ctk.CTkButton(self.sidebar, text="🔁 Transfert", command=self.show_transfer_view,width=140,height=30,corner_radius=10,fg_color="#669966",hover_color="#224466",font=("Segoe UI", 14)).pack(pady=10, padx=10)
         ctk.CTkButton(self.sidebar,text="📜 Historique",command=self.show_history_view,width=140,height=30,corner_radius=10,fg_color="#669966",hover_color="#224466",font=("Segoe UI", 14)).pack(pady=10, padx=10)
         ctk.CTkButton(self.sidebar, text="🏠 Vue globale", command=self.show_overview,width=140,height=30,corner_radius=10,fg_color="#669966",hover_color="#224466",font=("Segoe UI", 14)).pack(pady=10, padx=10)
-        ctk.CTkButton(self.sidebar, text="🚪 Quitter", command=self.destroy,width=140,height=30,corner_radius=10,fg_color="#669966",hover_color="#224466",font=("Segoe UI", 14)).pack(pady=10, padx=10)
+        ctk.CTkButton(self.sidebar, text="🚪 Quitter", command=self.quit_to_main,width=140,height=30,corner_radius=10,fg_color="#669966",hover_color="#224466",font=("Segoe UI", 14)).pack(pady=10, padx=10)
 
         self.show_welcome_view()
 
@@ -466,7 +466,9 @@ class AccountWindow(ctk.CTkToplevel):
         canvas = FigureCanvasTkAgg(fig, master=graph_container)
         canvas.draw()
         canvas.get_tk_widget().pack()
-    
+    def quit_to_main(self):
+        self.destroy()               # Ferme la fenêtre banquier
+        self.master.deiconify()
 
 
 
